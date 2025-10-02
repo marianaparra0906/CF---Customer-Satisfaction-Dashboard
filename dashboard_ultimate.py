@@ -1249,6 +1249,138 @@ with tab4:
         fig_gaps.update_layout(height=500)
         st.plotly_chart(fig_gaps, use_container_width=True)
 
+    # ===================================================================
+    # NUEVA GRÁFICA: Performance Evolution - All Metrics
+    # ===================================================================
+    st.subheader("📈 Performance Evolution - All Metrics")
+
+    # Create comprehensive performance evolution chart
+    months_evolution = ['May-June 2025', 'July 2025', 'August 2025', 'September 2025']
+
+    # All metrics data for evolution chart
+    all_metrics_evolution = {
+        'Overall Satisfaction': [9.48, 9.38, 9.36, 9.48],
+        'Likelihood to Buy Again': [9.58, 9.33, 9.21, 9.56],
+        'Likelihood to Recommend': [9.43, 9.25, 9.06, 9.60],
+        'Site Design': [9.68, 9.37, 9.26, 9.73],
+        'Ease of Finding': [9.63, 9.30, 9.21, 9.66],
+        'Product Information Clarity': [9.60, 9.28, 9.18, 9.63],
+        'Charges Stated Clearly': [9.48, 9.22, 9.16, 9.43],
+        'Checkout Process': [9.28, 9.07, 8.91, 9.31]
+    }
+
+    # Create the evolution chart
+    fig_evolution = go.Figure()
+
+    # Define colors for each metric
+    colors = [
+        '#1f77b4',  # Overall Satisfaction - blue
+        '#ff7f0e',  # Likelihood to Buy Again - orange
+        '#2ca02c',  # Likelihood to Recommend - green
+        '#d62728',  # Site Design - red
+        '#9467bd',  # Ease of Finding - purple
+        '#8c564b',  # Product Information Clarity - brown
+        '#e377c2',  # Charges Stated Clearly - pink
+        '#7f7f7f'   # Checkout Process - gray
+    ]
+
+    # Add each metric line
+    for i, (metric, scores) in enumerate(all_metrics_evolution.items()):
+        fig_evolution.add_trace(go.Scatter(
+            x=months_evolution,
+            y=scores,
+            mode='lines+markers',
+            name=metric,
+            line=dict(color=colors[i], width=2.5),
+            marker=dict(size=7, line=dict(width=1, color='white')),
+            hovertemplate=f'<b>{metric}</b><br>' +
+                          'Month: %{x}<br>' +
+                          'Score: %{y:.2f}<br>' +
+                          '<extra></extra>'
+        ))
+
+    # Add target line
+    fig_evolution.add_hline(
+        y=9.0,
+        line_dash="dash",
+        line_color="red",
+        line_width=2,
+        annotation_text="Target (9.0)",
+        annotation_position="top right"
+    )
+
+    # Update layout for the evolution chart
+    fig_evolution.update_layout(
+        title="Performance Evolution - All Metrics Over Time",
+        xaxis_title="Month",
+        yaxis_title="Score",
+        height=600,
+        showlegend=True,
+        legend=dict(
+            orientation="v",
+            yanchor="top",
+            y=1,
+            xanchor="left", 
+            x=1.01,
+            bgcolor="rgba(255,255,255,0.8)",
+            bordercolor="rgba(0,0,0,0.2)",
+            borderwidth=1
+        ),
+        hovermode='x unified',
+        plot_bgcolor='rgba(248,250,252,0.8)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        xaxis=dict(
+            gridcolor='rgba(226,232,240,0.8)',
+            gridwidth=1
+        ),
+        yaxis=dict(
+            gridcolor='rgba(226,232,240,0.8)',
+            gridwidth=1,
+            range=[8.8, 9.8]
+        )
+    )
+
+    st.plotly_chart(fig_evolution, use_container_width=True)
+
+    # Add insights about the evolution
+    st.markdown("#### 📊 Performance Evolution Insights")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        # Best performing metrics
+        latest_scores = {metric: scores[-1] for metric, scores in all_metrics_evolution.items()}
+        best_metric = max(latest_scores, key=latest_scores.get)
+        worst_metric = min(latest_scores, key=latest_scores.get)
+
+        st.markdown(f"""
+        **🏆 Top Performer:**  
+        {best_metric}: {latest_scores[best_metric]:.2f}
+
+        **⚠️ Needs Attention:**  
+        {worst_metric}: {latest_scores[worst_metric]:.2f}
+        """)
+
+    with col2:
+        # Trend analysis
+        improving_metrics = []
+        declining_metrics = []
+
+        for metric, scores in all_metrics_evolution.items():
+            trend = scores[-1] - scores[0]
+            if trend > 0.05:
+                improving_metrics.append(f"📈 {metric}")
+            elif trend < -0.05:
+                declining_metrics.append(f"📉 {metric}")
+
+        st.markdown("**📈 Improving Trends:**")
+        for metric in improving_metrics:
+            st.markdown(f"- {metric}")
+
+        if declining_metrics:
+            st.markdown("**📉 Declining Trends:**")
+            for metric in declining_metrics:
+                st.markdown(f"- {metric}")
+
     # Business intelligence insights (Your original detailed analysis)
     st.subheader(f"Business Intelligence Insights: {selected_risk_metric}")
 
